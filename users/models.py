@@ -5,8 +5,6 @@ from users.const import PAYER_ACCOUNT_NUMBER_MAX_LEN
 
 
 class UserProfile(AbstractUser):
-    """Custom User model."""
-
     username = models.EmailField('Адрес электронной почты', unique=True)
     payer_account_number = models.CharField(
         'Учетный номер плательщика',
@@ -19,4 +17,12 @@ class UserProfile(AbstractUser):
     def __str__(self):
         return f'User(id={self.id}, email={self.username})'
     
+
+class RegistrationSession(models.Model):
+    email = models.EmailField()
+    confirm_code = models.PositiveIntegerField()
+    expiration_time = models.DateTimeField()
+
+    def __str__(self):
+        return f'RegistrationSessin(email={self.email}, confirm_code={self.confirm_code})'
 
