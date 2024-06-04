@@ -14,6 +14,7 @@ class UserSerializer(serializers.ModelSerializer):
             'password',
             'first_name',
             'last_name',
+            'patronymic',
             'payer_account_number'
         )
         extra_kwargs = {'password': {'write_only': True}}
@@ -23,6 +24,7 @@ class UserSerializer(serializers.ModelSerializer):
             username=validated_data['username'],
             first_name=validated_data['first_name'],
             last_name=validated_data['last_name'],
+            patronymic=validated_data['patronymic'],
             is_active=False,
             payer_account_number=validated_data['payer_account_number']
         )
