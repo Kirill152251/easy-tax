@@ -1,24 +1,51 @@
-from django.contrib.auth.models import AbstractUser
+from uuid import uuid4
+
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.db import models
 
-from users.const import PAYER_ACCOUNT_NUMBER_MAX_LEN
+from users.const import (PAYER_ACCOUNT_NUMBER_MAX_LEN, FIRST_NAME_MAX_LEN,
+                         LAST_NAME_MAX_LEN, PATRONYMIC_MAX_LEN)
+ 
+
+class UserProfileManager(BaseUserManager):
+
+    def create_user(self, email, password, **kwargs):
+        if not email:
+            raise ValueError('Email not provided')
+        user = self.model(email=self.normalize_email(email), **kwargs)
+        user.set_password(password)
+        user.save()
+        return user
+    
+    def create_superuser(self, email, password):
+        user = self.model(email=email, password=password)
+        user.is_superuser = True
+        user.is_staff = True
+        user.save()
+        return user
 
 
-class UserProfile(AbstractUser):
-    username = models.EmailField('Адрес электронной почты', unique=True)
-    first_name = models.CharField('Имя', max_length=150)
-    last_name = models.CharField('Фамилия', max_length=150)
-    patronymic = models.CharField('Отчество', max_length=150)
+class UserProfile(AbstractBaseUser, PermissionsMixin):
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    email = models.EmailField('Адрес электронной почты', unique=True)
+    first_name = models.CharField('Имя', max_length=FIRST_NAME_MAX_LEN)
+    last_name = models.CharField('Фамилия', max_length=LAST_NAME_MAX_LEN)
+    patronymic = models.CharField('Отчество', max_length=PATRONYMIC_MAX_LEN)
     payer_account_number = models.CharField(
         'Учетный номер плательщика',
         max_length=PAYER_ACCOUNT_NUMBER_MAX_LEN
     )
+    created_at = models.DateField(auto_now_add=True)
+    is_staff = models.BooleanField(default=False)
+
+    USERNAME_FIELD = 'email'
+    objects = UserProfileManager()
 
     class Meta:
-        ordering = ('username',)
+        ordering = ('email',)
 
     def __str__(self):
-        return f'User(id={self.id}, email={self.username})'
+        return f'User(id={self.id}, email={self.email})'
     
 
 class RegistrationSession(models.Model):
