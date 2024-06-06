@@ -33,6 +33,7 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
     #TODO: implement password validation
+    
 
     def validate_username(self, value):
         if User.objects.filter(username=value).exist():
