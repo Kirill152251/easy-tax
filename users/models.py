@@ -33,10 +33,13 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
     patronymic = models.CharField('Отчество', max_length=PATRONYMIC_MAX_LEN)
     payer_account_number = models.CharField(
         'Учетный номер плательщика',
-        max_length=PAYER_ACCOUNT_NUMBER_MAX_LEN
+        max_length=PAYER_ACCOUNT_NUMBER_MAX_LEN,
+        blank=True
     )
+    secret_word = models.CharField(blank=True) #TODO: remove blank and implement hashing during registration
     created_at = models.DateField(auto_now_add=True)
     is_staff = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'email'
     objects = UserProfileManager()
@@ -48,11 +51,12 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
         return f'User(id={self.id}, email={self.email})'
     
 
-class RegistrationSession(models.Model):
+class SignupSession(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     email = models.EmailField()
     confirm_code = models.PositiveIntegerField()
     expiration_time = models.DateTimeField()
 
     def __str__(self):
-        return f'RegistrationSessin(email={self.email}, confirm_code={self.confirm_code})'
+        return f'SighupSession(email={self.email}, confirm_code={self.confirm_code})'
 

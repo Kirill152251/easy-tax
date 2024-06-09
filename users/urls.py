@@ -1,10 +1,10 @@
-from django.urls import include, path
+from django.urls import path
 
-from users.views import RegistrationView, confirm_code
+from users.views import SignupAPIView, confirm_code
 
 
 urlpatterns = [
-    path('signup/', RegistrationView.as_view(), name='signup'),
-    path('confirm_code/<int:code>/<int:code_id>/', confirm_code, name='confirm_code'),
+    path('signup/', SignupAPIView.as_view(), name='signup'),
+    path('confirm_code/<int:code>/<str:code_id>/', confirm_code, name='confirm_code'),
 ]
 
