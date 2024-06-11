@@ -73,8 +73,7 @@ class SignupAPIView(CreateAPIView):
             from_email=settings.EMAIL_HOST_USER,
             recipient_list=[email]
         )
-
-        return Response({'confirm_code_id': str(session.id)}, status=status.HTTP_200_OK)
+        return Response({'confirm_code_id': str(session.id)}, status=status.HTTP_201_CREATED)
 
 
 @extend_schema(
@@ -95,16 +94,16 @@ class SignupAPIView(CreateAPIView):
 )
 @api_view(['POST'])
 @permission_classes([AllowAny])
-def confirm_code(request, code, code_id):
+def confirm_code(request, code, confirm_code_id):
     """
     Через параметры запроса получает код подверждения и его id
     (см. /api/v1/singup/) и заканчивает регистрацию, активируя пользователя.
     """
-    session = get_object_or_404(SignupSession, pk=code_id) 
+    session = get_object_or_404(SignupSession, pk=confirm_code_id) 
 
     if session.confirm_code != code:
         return Response(
-            DetailSerializer('wrong code').data,
+            DetailSerializer({'details':'wrong code'}).data,
             status=status.HTTP_400_BAD_REQUEST
         )
     

@@ -11,6 +11,6 @@ url_v1 = [
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/v1/', include(url_v1))
+    path('api/dev/', include(url_v1))
 ]
 
