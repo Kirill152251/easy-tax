@@ -20,6 +20,15 @@ def test_signup_success(client, signup_url, signup_body):
     assert 'confirm_code_id' in response.data
     assert len(mail.outbox) == 1
 
+@pytest.mark.django_db
+def test_signup_success_without_patronymic(client, signup_url, signup_body):
+    signup_body.pop('patronymic')
+    response = client.post(signup_url, data=signup_body)
+    assert response.status_code == status.HTTP_201_CREATED
+    assert User.objects.count() == 1
+    assert User.objects.first().is_active == False
+    assert 'confirm_code_id' in response.data
+    assert len(mail.outbox) == 1
 
 @pytest.mark.django_db
 def test_confirm_code_success(

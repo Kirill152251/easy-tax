@@ -1,6 +1,6 @@
 from random import randint
 
-from drf_spectacular.utils import extend_schema, inline_serializer, OpenApiResponse
+from drf_spectacular.utils import extend_schema, inline_serializer, OpenApiResponse, OpenApiExample
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
@@ -13,7 +13,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from easy_tax_api.serializers import DetailSerializer
-from users.serializers import SignupSerializer
+from users.serializers import SignupSerializer, UserSerializer
 from users.models import SignupSession
 
 
@@ -27,7 +27,8 @@ class SignupAPIView(CreateAPIView):
     При успешном выполнении возвращает id кода подтверждения, 
     который нужен будет, что бы активировать пользователя и 
     закончить его регистрацию. Если пользователь с указаным в запросе
-    email уже активирован - вернет 202. 
+    email уже активирован - вернет 202. В теле запроса все поля кроме
+    отчества обязательны.
     """
 
     queryset = User.objects.all()
@@ -36,16 +37,23 @@ class SignupAPIView(CreateAPIView):
 
     @extend_schema(
         tags=['Signup'],
+        request=SignupSerializer,
         responses={
-            status.HTTP_201_CREATED: inline_serializer(
-                name='SignupResponse',
-                fields={
-                    'confirm_code_id': serializers.IntegerField(),
-                }
+            status.HTTP_201_CREATED: OpenApiResponse(
+                description="Неактивный пользователь cохранен, письмо отправлено.",
+                response=inline_serializer(
+                    name='SignupResponse',
+                    fields={
+                        'confirm_code_id': serializers.CharField(),
+                    }
+                )
             ),
             status.HTTP_202_ACCEPTED: OpenApiResponse(
                 description='Пользователь уже активирован.'
             ),
+            status.HTTP_400_BAD_REQUEST: OpenApiResponse(
+                description='Ошибка валидации.' 
+            )
         }
     )
     def post(self, request):
@@ -80,6 +88,7 @@ class SignupAPIView(CreateAPIView):
     tags=['Signup'],
     responses={
         status.HTTP_200_OK: OpenApiResponse(
+            response=UserSerializer,
             description='Пользователь активирован успешно.'
         ),
         status.HTTP_400_BAD_REQUEST: OpenApiResponse(
@@ -116,5 +125,5 @@ def confirm_code(request, code, confirm_code_id):
     user = User.objects.get(email=session.email)
     user.is_active = True
     user.save()
-    return Response(status=status.HTTP_200_OK)
+    return Response(data=UserSerializer(user).data, status=status.HTTP_200_OK)
 

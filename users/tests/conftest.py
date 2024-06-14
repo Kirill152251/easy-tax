@@ -20,18 +20,18 @@ def signup_url():
 @pytest.fixture
 def signup_body():
     return {
-        "email": "user@example.com",
-        "password": "string",
-        "first_name": "string",
-        "last_name": "string",
-        "patronymic": "string"
+        "email": "user@gmail.com",
+        "password": "sTring32%21",
+        "first_name": "телс",
+        "last_name": "афдоафо",
+        "patronymic": "фаощшфофо",
+        "secret_word": "string"
     }
 
 @pytest.fixture
 def inactive_user(client, signup_url, signup_body):
     response = client.post(signup_url, data=signup_body)
     return User.objects.get(email=signup_body['email'])
-
 
 @pytest.fixture
 def active_user(client, signup_url, signup_body):
