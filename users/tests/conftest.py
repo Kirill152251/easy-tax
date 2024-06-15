@@ -11,11 +11,13 @@ User = get_user_model()
 
 @pytest.fixture
 def client():
-    return Client() 
+    return Client()
+
 
 @pytest.fixture
 def signup_url():
     return reverse('users:signup')
+
 
 @pytest.fixture
 def signup_body():
@@ -28,10 +30,12 @@ def signup_body():
         "secret_word": "string"
     }
 
+
 @pytest.fixture
 def inactive_user(client, signup_url, signup_body):
-    response = client.post(signup_url, data=signup_body)
+    client.post(signup_url, data=signup_body)
     return User.objects.get(email=signup_body['email'])
+
 
 @pytest.fixture
 def active_user(client, signup_url, signup_body):
@@ -41,4 +45,3 @@ def active_user(client, signup_url, signup_body):
     code = ''.join(d for d in email_massage if d.isdigit())
     client.post(reverse('users:confirm_code', args=(code, confirm_code_id)))
     return User.objects.get(email=signup_body['email'])
-

@@ -24,7 +24,6 @@ class UserSerializer(serializers.ModelSerializer):
         )
 
 
-
 class SignupSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(
         validators=[UniqueValidator(queryset=User.objects.all())]
@@ -79,13 +78,13 @@ class SignupSerializer(serializers.ModelSerializer):
         user.secret_word = pwd_context.hash(validated_data['secret_word'])
         user.save()
         return user
-    
+
     def validate_secret_word(self, validated_data):
         try:
             highpoints = re.compile(u'[\U00010000-\U0010ffff]')
         except re.error:
             highpoints = re.compile(u'[\uD800-\uDBFF][\uDC00-\uDFFF]')
-        if highpoints.search(validated_data) != None:
+        if highpoints.search(validated_data) is not None:
             raise serializers.ValidationError('Secret word must not contain emoji')
         return validated_data
 
@@ -94,7 +93,7 @@ class SignupSerializer(serializers.ModelSerializer):
         capital_check = re.search(r'[A-Z]', validated_data)
         digits_check = re.search(r'\d', validated_data)
         repeats_check = re.search(r'(.)\1{2}', validated_data)
-        if chars_check == None or capital_check == None or digits_check == None or repeats_check != None:
+        if chars_check is None or capital_check is None or digits_check is None or repeats_check is not None:
             raise serializers.ValidationError('Invalid password')
         return validated_data
 
@@ -118,5 +117,4 @@ class SignupSerializer(serializers.ModelSerializer):
             email_info = validate_email(validated_data, check_deliverability=True)
             return email_info.normalized
         except EmailNotValidError as e:
-                raise serializers.ValidationError(e)
-
+            raise serializers.ValidationError(e)

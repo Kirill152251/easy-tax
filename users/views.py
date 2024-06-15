@@ -1,6 +1,6 @@
 from random import randint
 
-from drf_spectacular.utils import extend_schema, inline_serializer, OpenApiResponse, OpenApiExample
+from drf_spectacular.utils import extend_schema, inline_serializer, OpenApiResponse
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
@@ -24,8 +24,8 @@ class SignupAPIView(CreateAPIView):
     """
     Сохраняет пользователя в неактивном состоянии и отравляет на
     его почту письмо с кодом подтверждения.
-    При успешном выполнении возвращает id кода подтверждения, 
-    который нужен будет, что бы активировать пользователя и 
+    При успешном выполнении возвращает id кода подтверждения,
+    который нужен будет, что бы активировать пользователя и
     закончить его регистрацию. Если пользователь с указаным в запросе
     email уже активирован - вернет 202. В теле запроса все поля кроме
     отчества обязательны.
@@ -52,7 +52,7 @@ class SignupAPIView(CreateAPIView):
                 description='Пользователь уже активирован.'
             ),
             status.HTTP_400_BAD_REQUEST: OpenApiResponse(
-                description='Ошибка валидации.' 
+                description='Ошибка валидации.'
             )
         }
     )
@@ -93,12 +93,12 @@ class SignupAPIView(CreateAPIView):
         ),
         status.HTTP_400_BAD_REQUEST: OpenApiResponse(
             response=DetailSerializer,
-            description='Если неправельный код подтверждения: {"details": "wrong code"}. ' 
+            description='Если неправельный код подтверждения: {"details": "wrong code"}. '
                         'Если срок действия кода истек: {"details": "code expired"}.'
         ),
         status.HTTP_404_NOT_FOUND: OpenApiResponse(
             description='Несуществующий code_id.'
-        ) 
+        )
     }
 )
 @api_view(['POST'])
@@ -108,17 +108,17 @@ def confirm_code(request, code, confirm_code_id):
     Через параметры запроса получает код подверждения и его id
     (см. /api/v1/singup/) и заканчивает регистрацию, активируя пользователя.
     """
-    session = get_object_or_404(SignupSession, pk=confirm_code_id) 
+    session = get_object_or_404(SignupSession, pk=confirm_code_id)
 
     if session.confirm_code != code:
         return Response(
-            DetailSerializer({'details':'wrong code'}).data,
+            DetailSerializer({'details': 'wrong code'}).data,
             status=status.HTTP_400_BAD_REQUEST
         )
-    
+
     if timezone.now() > session.expiration_time:
         return Response(
-            DetailSerializer({'details':'code expired'}).data,
+            DetailSerializer({'details': 'code expired'}).data,
             status=status.HTTP_400_BAD_REQUEST
         )
 
@@ -126,4 +126,3 @@ def confirm_code(request, code, confirm_code_id):
     user.is_active = True
     user.save()
     return Response(data=UserSerializer(user).data, status=status.HTTP_200_OK)
-
