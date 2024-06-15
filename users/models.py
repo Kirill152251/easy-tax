@@ -5,7 +5,7 @@ from django.db import models
 
 from users.const import (PAYER_ACCOUNT_NUMBER_MAX_LEN, FIRST_NAME_MAX_LEN,
                          LAST_NAME_MAX_LEN, PATRONYMIC_MAX_LEN, SECRETWORD_MAX_LEN)
- 
+
 
 class UserProfileManager(BaseUserManager):
 
@@ -16,7 +16,7 @@ class UserProfileManager(BaseUserManager):
         user.set_password(password)
         user.save()
         return user
-    
+
     def create_superuser(self, email, password):
         user = self.model(email=email, password=password)
         user.is_superuser = True
@@ -49,7 +49,7 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return f'User(id={self.id}, email={self.email})'
-    
+
 
 class SignupSession(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
@@ -59,4 +59,3 @@ class SignupSession(models.Model):
 
     def __str__(self):
         return f'SighupSession(email={self.email}, confirm_code={self.confirm_code})'
-
