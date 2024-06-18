@@ -30,24 +30,29 @@ class SignupSerializer(serializers.ModelSerializer):
     )
     first_name = serializers.CharField(
         min_length=const.FIRST_NAME_MIN_LEN,
-        max_length=const.FIRST_NAME_MAX_LEN
+        max_length=const.FIRST_NAME_MAX_LEN,
+        trim_whitespace=False
     )
     last_name = serializers.CharField(
         min_length=const.LAST_NAME_MIN_LEN,
-        max_length=const.LAST_NAME_MAX_LEN
+        max_length=const.LAST_NAME_MAX_LEN,
+        trim_whitespace=False
     )
     patronymic = serializers.CharField(
         min_length=const.PATRONYMIC_MIN_LEN,
         max_length=const.PATRONYMIC_MAX_LEN,
-        required=False
+        required=False,
+        trim_whitespace=False
     )
     password = serializers.CharField(
         min_length=const.PASSWORD_MIN_LEN,
-        max_length=const.PASSWORD_MAX_LEN
+        max_length=const.PASSWORD_MAX_LEN,
+        trim_whitespace=False
     )
     secret_word = serializers.CharField(
         min_length=const.SECRETWORD_MIN_LEN,
-        max_length=const.SECRETWORD_MAX_LEN
+        max_length=const.SECRETWORD_MAX_LEN,
+        trim_whitespace=False
     )
 
     class Meta:
@@ -72,7 +77,7 @@ class SignupSerializer(serializers.ModelSerializer):
             email=validated_data['email'],
             first_name=validated_data['first_name'],
             last_name=validated_data['last_name'],
-            patronymic=validated_data['patronymic'],
+            patronymic=validated_data.get('patronymic', None),
         )
         user.set_password(validated_data['password'])
         user.secret_word = pwd_context.hash(validated_data['secret_word'])
@@ -81,6 +86,7 @@ class SignupSerializer(serializers.ModelSerializer):
 
     def validate_secret_word(self, validated_data):
         try:
+            # Looking for emoji
             highpoints = re.compile(u'[\U00010000-\U0010ffff]')
         except re.error:
             highpoints = re.compile(u'[\uD800-\uDBFF][\uDC00-\uDFFF]')
@@ -90,10 +96,17 @@ class SignupSerializer(serializers.ModelSerializer):
 
     def validate_password(self, validated_data):
         chars_check = re.fullmatch(r'[a-zA-Z0-9_!@#$%^&*()+-:;,.]+', validated_data)
-        capital_check = re.search(r'[A-Z]', validated_data)
+        uppercase_check = re.search(r'[A-Z]', validated_data)
+        lowercase_check = re.search(r'[a-z]', validated_data)
         digits_check = re.search(r'\d', validated_data)
         repeats_check = re.search(r'(.)\1{2}', validated_data)
-        if chars_check is None or capital_check is None or digits_check is None or repeats_check is not None:
+        if (
+            chars_check is None or
+            uppercase_check is None or
+            lowercase_check is None or
+            digits_check is None or
+            repeats_check is not None
+        ):
             raise serializers.ValidationError('Invalid password')
         return validated_data
 

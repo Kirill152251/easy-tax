@@ -33,7 +33,7 @@ class SignupAPIView(CreateAPIView):
 
     queryset = User.objects.all()
     serializer_class = SignupSerializer
-    permission_classes = [AllowAny,]
+    permission_classes = [AllowAny]
 
     @extend_schema(
         tags=['Signup'],
@@ -57,6 +57,9 @@ class SignupAPIView(CreateAPIView):
         }
     )
     def post(self, request):
+        if not request.data.get('email', None):
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
         email = request.data['email']
         if not User.objects.filter(email=email).exists():
             serializer = self.get_serializer(data=request.data)

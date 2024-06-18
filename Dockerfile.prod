@@ -10,7 +10,7 @@ WORKDIR /code
 RUN pip install --upgrade pip
 RUN pip install flake8
 COPY . /code
-RUN flake8 --ignore=E501,F401 .
+RUN flake8 --ignore=E501,F401,W504,W503 .
 
 COPY requirements.txt .
 RUN pip wheel --no-cache-dir --no-deps --wheel-dir /code/wheels -r requirements.txt

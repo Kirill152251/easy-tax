@@ -6,11 +6,11 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-SECRET_KEY = os.getenv('SECRET_KEY')
+SECRET_KEY = os.getenv('SECRET_KEY', default='default')
 
-DEBUG = bool(os.getenv('DEBUG', default=0))
+DEBUG = bool(int(os.getenv('DEBUG', default=0)))
 
-ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS').split(' ')
+ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', default='').split(' ')
 
 
 INSTALLED_APPS = [

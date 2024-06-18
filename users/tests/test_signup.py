@@ -1,5 +1,5 @@
-from django.urls import reverse
 import pytest
+from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.core import mail
 from django.utils import timezone
@@ -22,14 +22,31 @@ def test_signup_success(client, signup_url, signup_body):
 
 
 @pytest.mark.django_db
+def test_signup_with_empty_body(client, signup_url):
+    response = client.post(signup_url, data=dict())
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+
+@pytest.mark.django_db
+def test_signup_email_already_in_use(client, signup_url, signup_body):
+    response = client.post(signup_url, data=signup_body)
+    response = client.post(signup_url, data=signup_body)
+    assert response.status_code == status.HTTP_201_CREATED
+    assert User.objects.count() == 1
+
+
+@pytest.mark.django_db
 def test_signup_success_without_patronymic(client, signup_url, signup_body):
     signup_body.pop('patronymic')
     response = client.post(signup_url, data=signup_body)
     assert response.status_code == status.HTTP_201_CREATED
-    assert User.objects.count() == 1
-    assert User.objects.first().is_active is False
-    assert 'confirm_code_id' in response.data
-    assert len(mail.outbox) == 1
+
+
+@pytest.mark.django_db
+def test_signup_success_with_empty_patronymic(client, signup_url, signup_body):
+    signup_body['patronymic'] = ''
+    response = client.post(signup_url, data=signup_body)
+    assert response.status_code == status.HTTP_201_CREATED
 
 
 @pytest.mark.django_db

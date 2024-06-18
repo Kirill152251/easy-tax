@@ -4,7 +4,7 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseU
 from django.db import models
 
 from users.const import (PAYER_ACCOUNT_NUMBER_MAX_LEN, FIRST_NAME_MAX_LEN,
-                         LAST_NAME_MAX_LEN, PATRONYMIC_MAX_LEN, SECRETWORD_MAX_LEN)
+                         LAST_NAME_MAX_LEN, PATRONYMIC_MAX_LEN)
 
 
 class UserProfileManager(BaseUserManager):
@@ -30,11 +30,17 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField('Адрес электронной почты', unique=True)
     first_name = models.CharField('Имя', max_length=FIRST_NAME_MAX_LEN)
     last_name = models.CharField('Фамилия', max_length=LAST_NAME_MAX_LEN)
-    patronymic = models.CharField('Отчество', max_length=PATRONYMIC_MAX_LEN, blank=True)
+    patronymic = models.CharField(
+        'Отчество',
+        max_length=PATRONYMIC_MAX_LEN,
+        blank=True,
+        null=True
+    )
     payer_account_number = models.CharField(
         'Учетный номер плательщика',
         max_length=PAYER_ACCOUNT_NUMBER_MAX_LEN,
-        blank=True
+        blank=True,
+        null=True
     )
     secret_word = models.CharField(blank=True)
     created_at = models.DateField(auto_now_add=True)

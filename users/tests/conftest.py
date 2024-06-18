@@ -1,4 +1,3 @@
-from django.db.models.fields import return_None
 import pytest
 from django.core import mail
 from django.contrib.auth import get_user_model
