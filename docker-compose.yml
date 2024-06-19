@@ -1,21 +1,23 @@
-version: '3.9'
-
 services:
-  etdb:
+  db:
     image: postgres:16-alpine
-    container_name: easy_tax_postgres
     volumes:
-      - ~/.pg/pg_data/easy_tax:/var/lib/postgresql/data
+      - postgres_data_dev:/var/lib/postgresql/data
     env_file:
-      - .env
+      - .env.dev
   app:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     env_file:
-      - .env
+      - .env.dev
     depends_on:
-      - etdb
+      - db
     volumes:
       - ./:/code
-    command: sh -c 'python manage.py migrate && python manage.py runserver 0.0.0.0:8000'
+    command: sh -c 'python manage.py runserver 0.0.0.0:8000'
     ports:
       - 8000:8000
+
+volumes:
+  postgres_data_dev:

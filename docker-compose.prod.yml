@@ -1,0 +1,34 @@
+services:
+  db:
+    image: postgres:16-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    env_file:
+      - .env.prod
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    volumes:
+      - static_volume:/home/app/api/staticfiles
+    env_file:
+      - .env.prod
+    depends_on:
+      - db
+    command: sh -c 'gunicorn easy_tax_api.wsgi:application --bind 0.0.0.0:8000'
+    expose:
+      - 8000
+
+  nginx:
+    build: ./nginx
+    ports:
+      - 1337:80
+    volumes:
+      - static_volume:/home/app/api/staticfiles
+    depends_on:
+      - app
+
+volumes:
+  postgres_data:
+  static_volume:
