@@ -26,7 +26,7 @@ def signup_body():
         "first_name": "телс",
         "last_name": "афдоафо",
         "patronymic": "фаощшфофо",
-        "secret_word": "string"
+        "secret_word": "слово"
     }
 
 

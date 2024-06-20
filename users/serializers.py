@@ -42,7 +42,8 @@ class SignupSerializer(serializers.ModelSerializer):
         min_length=const.PATRONYMIC_MIN_LEN,
         max_length=const.PATRONYMIC_MAX_LEN,
         required=False,
-        trim_whitespace=False
+        trim_whitespace=False,
+        allow_blank=True
     )
     password = serializers.CharField(
         min_length=const.PASSWORD_MIN_LEN,
@@ -85,13 +86,9 @@ class SignupSerializer(serializers.ModelSerializer):
         return user
 
     def validate_secret_word(self, validated_data):
-        try:
-            # Looking for emoji
-            highpoints = re.compile(u'[\U00010000-\U0010ffff]')
-        except re.error:
-            highpoints = re.compile(u'[\uD800-\uDBFF][\uDC00-\uDFFF]')
-        if highpoints.search(validated_data) is not None:
-            raise serializers.ValidationError('Secret word must not contain emoji')
+        chars_check = re.fullmatch(r'[а-яА-яЁё]+', validated_data)
+        if chars_check is None:
+            raise serializers.ValidationError('Ivalid secret word')
         return validated_data
 
     def validate_password(self, validated_data):
@@ -110,19 +107,22 @@ class SignupSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('Invalid password')
         return validated_data
 
+    def fio_validation(self, string, error_msg):
+        if not re.fullmatch(pattern=const.FIO_REGEX, string=string) or '--' in string:
+            raise serializers.ValidationError(error_msg)
+
     def validate_first_name(self, validated_data):
-        if not re.fullmatch(pattern=const.FIO_REGEX, string=validated_data):
-            raise serializers.ValidationError('Invalid first name')
+        self.fio_validation(validated_data, 'Invalid first name')
         return validated_data
 
     def validate_last_name(self, validated_data):
-        if not re.fullmatch(pattern=const.FIO_REGEX, string=validated_data):
-            raise serializers.ValidationError('Invalid last name')
+        self.fio_validation(validated_data, 'Invalid last name')
         return validated_data
 
     def validate_patronymic(self, validated_data):
-        if not re.fullmatch(pattern=const.FIO_REGEX, string=validated_data):
-            raise serializers.ValidationError('Invalid patronymic')
+        if validated_data == '':
+            return None
+        self.fio_validation(validated_data, 'Invalid patronymic')
         return validated_data
 
     def validate_email(self, validated_data):

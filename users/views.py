@@ -4,6 +4,7 @@ from drf_spectacular.utils import extend_schema, inline_serializer, OpenApiRespo
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
+from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework import status, serializers
@@ -98,6 +99,7 @@ class SignupAPIView(CreateAPIView):
             response=DetailSerializer,
             description='Если неправельный код подтверждения: {"details": "wrong code"}. '
                         'Если срок действия кода истек: {"details": "code expired"}.'
+                        'Если неправильный формат confirm_code_id: {"details": "incorrect confirm_code_id"}.'
         ),
         status.HTTP_404_NOT_FOUND: OpenApiResponse(
             description='Несуществующий code_id.'
@@ -111,7 +113,13 @@ def confirm_code(request, code, confirm_code_id):
     Через параметры запроса получает код подверждения и его id
     (см. /api/v1/singup/) и заканчивает регистрацию, активируя пользователя.
     """
-    session = get_object_or_404(SignupSession, pk=confirm_code_id)
+    try:
+        session = get_object_or_404(SignupSession, pk=confirm_code_id)
+    except ValidationError:
+        return Response(
+            DetailSerializer({'details': 'incorrect confirm_code_id'}).data,
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
     if session.confirm_code != code:
         return Response(
