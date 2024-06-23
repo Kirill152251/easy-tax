@@ -108,7 +108,11 @@ class SignupSerializer(serializers.ModelSerializer):
         return validated_data
 
     def fio_validation(self, string, error_msg):
-        if not re.fullmatch(pattern=const.FIO_REGEX, string=string) or '--' in string:
+        if (
+            re.fullmatch(pattern=const.FIO_REGEX, string=string) is None or
+            '--' in string or
+            string == '-'
+        ):
             raise serializers.ValidationError(error_msg)
 
     def validate_first_name(self, validated_data):

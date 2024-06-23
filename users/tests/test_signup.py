@@ -84,7 +84,7 @@ def test_confirm_code_wrong_format_of_code_id(client, signup_url, signup_body):
     client.post(signup_url, data=signup_body)
     email_massage = mail.outbox[0].body
     code = ''.join(d for d in email_massage if d.isdigit())
-    response = client.post(reverse('users:confirm_code', args=('314921', '5179fh91')))
+    response = client.post(reverse('users:confirm_code', args=(code, '5179fh91')))
     assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 
@@ -94,7 +94,7 @@ def test_confirm_code_code_id_not_exist(client, signup_url, signup_body):
     confirm_code_id = response.data['confirm_code_id']
     email_massage = mail.outbox[0].body
     code = ''.join(d for d in email_massage if d.isdigit())
-    response = client.post(reverse('users:confirm_code', args=('314921', confirm_code_id[::-1])))
+    response = client.post(reverse('users:confirm_code', args=(code, confirm_code_id[::-1])))
     assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
