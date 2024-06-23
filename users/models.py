@@ -54,7 +54,7 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
         ordering = ('email',)
 
     def __str__(self):
-        return f'User(id={self.id}, email={self.email})'
+        return f'User(id={self.id}, email={self.email}, is_active={self.is_active})'
 
 
 class SignupSession(models.Model):
