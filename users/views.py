@@ -14,6 +14,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from easy_tax_api.serializers import DetailSerializer
+from users.const import CONFIRM_CODE_EXPIRATION_TIME_MIN
 from users.serializers import SignupSerializer, UserSerializer
 from users.models import SignupSession
 
@@ -75,7 +76,7 @@ class SignupAPIView(CreateAPIView):
         session = SignupSession(
             confirm_code=conf_code,
             email=email,
-            expiration_time=timezone.now() + timezone.timedelta(minutes=1)
+            expiration_time=timezone.now() + timezone.timedelta(minutes=CONFIRM_CODE_EXPIRATION_TIME_MIN)
         )
         session.save()
 
