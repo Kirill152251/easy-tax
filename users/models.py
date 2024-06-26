@@ -18,9 +18,10 @@ class UserProfileManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, password):
-        user = self.model(email=email, password=password)
+        user = self.create_user(email=email, password=password)
         user.is_superuser = True
         user.is_staff = True
+        user.is_active = True
         user.save()
         return user
 
@@ -54,7 +55,7 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
         ordering = ('email',)
 
     def __str__(self):
-        return f'User(id={self.id}, email={self.email}, is_active={self.is_active})'
+        return f'User(email={self.email}, is_active={self.is_active})'
 
 
 class SignupSession(models.Model):
