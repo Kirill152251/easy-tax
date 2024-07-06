@@ -17,6 +17,7 @@ def test_signup_success(client, signup_url, signup_body):
     assert response.status_code == status.HTTP_201_CREATED
     assert User.objects.count() == 1
     assert User.objects.first().is_active is False
+    assert User.objects.first().first_name == signup_body['first_name']
     assert 'confirm_code_id' in response.data
     assert len(mail.outbox) == 1
 
@@ -109,3 +110,23 @@ def test_confirm_code_code_expired(client, signup_url, signup_body):
     session.save()
     response = client.post(reverse('users:confirm_code', args=(code, confirm_code_id)))
     assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+
+@pytest.mark.django_db
+def test_updated_user_after_new_confirm_code(
+    client,
+    signup_url,
+    signup_body
+):
+    new_first_name = 'аоыда'
+    new_last_name = 'афдодф'
+    client.post(signup_url, data=signup_body)
+    updated_body = signup_body.copy()
+    updated_body['first_name'] = new_first_name
+    updated_body['last_name'] = new_last_name
+    response = client.post(signup_url, data=updated_body)
+
+    user = User.objects.all().first()
+    assert user.first_name == new_first_name
+    assert user.last_name == new_last_name
+    assert user.patronymic == signup_body['patronymic']

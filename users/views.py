@@ -71,6 +71,8 @@ class SignupAPIView(CreateAPIView):
             is_active = User.objects.get(email=email).is_active
             if is_active:
                 return Response(status=status.HTTP_202_ACCEPTED)
+            else:
+                User.objects.filter(email=email).update(**request.data.dict())
 
         conf_code = randint(100000, 999999)
         session = SignupSession(
