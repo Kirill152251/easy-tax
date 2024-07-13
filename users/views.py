@@ -13,8 +13,8 @@ from rest_framework.generics import CreateAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
+from core.const import CONFIRM_CODE_EXPIRATION_TIME_MIN
 from easy_tax_api.serializers import DetailSerializer
-from users.const import CONFIRM_CODE_EXPIRATION_TIME_MIN
 from users.serializers import SignupSerializer, UserSerializer
 from users.models import SignupSession
 

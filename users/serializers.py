@@ -5,7 +5,7 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 from passlib.context import CryptContext
 
-from users import const
+from core import const
 
 
 User = get_user_model()

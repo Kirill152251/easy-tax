@@ -124,7 +124,6 @@ def test_updated_user_after_new_confirm_code(
     updated_body = signup_body.copy()
     updated_body['first_name'] = new_first_name
     updated_body['last_name'] = new_last_name
-    response = client.post(signup_url, data=updated_body)
 
     user = User.objects.all().first()
     assert user.first_name == new_first_name

@@ -4,11 +4,12 @@ from django.contrib.auth.admin import UserAdmin
 
 User = get_user_model()
 
+
 class CustomUserAdmin(UserAdmin):
     fieldsets = (
         (
-            None, 
-            {'fields': ['email','first_name','last_name', 'patronymic','is_active']}
+            None,
+            {'fields': ['email', 'first_name', 'last_name', 'patronymic', 'is_active']}
         ),
     )
     ordering = ('email',)

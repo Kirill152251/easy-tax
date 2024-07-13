@@ -1,15 +1,10 @@
 from uuid import uuid4
 
-from django.contrib.auth import get_user
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.db import models
 
-from users.base_model import BaseModel
-from users import const 
-from decimal import Decimal
-
-
-User = get_user()
+from core import const
+from core.models import BaseModel
 
 
 class UserProfileManager(BaseUserManager):
@@ -90,109 +85,3 @@ class SignupSession(BaseModel):
 
     def __str__(self):
         return f'SighupSession(email={self.email}, confirm_code={self.confirm_code})'
-
-
-class ProductCategory(BaseModel):
-    name = models.CharField(
-        'Наименование категории товара',
-        max_length=const.CATEGOTY_NAME_MAX_LEN
-    )
-
-    class Meta:
-        verbose_name = 'Категория продукта'
-        verbose_name_plural = 'Категории продуктов'
-
-    def __str__(self):
-        return self.name[:30]
-
-
-class Product(BaseModel):
-    name = models.CharField('Наименование товара', max_length=const.PRODUCT_NAME_MAX_LEN)
-    description = models.CharField('Описание товара', max_length=const.PRODUCT_DESCRIP_MAX_LEN)
-    price = models.DecimalField('Стоимость товара', max_digits=10, decimal_places=2)
-    count = models.PositiveIntegerField(
-        'Количество товара в наличии',
-        null=True,
-        blank=True
-    )
-    #TODO not sure: 1 to many or many to many?
-    category = models.ForeignKey(ProductCategory, on_delete=models.CASCADE)
-    seller = models.ForeignKey(User, on_delete=models.CASCADE)
-
-    class Meta:
-        verbose_name = 'Товар'
-        verbose_name_plural = 'Товары'
-        default_related_name = 'products'
-
-    def __str__(self):
-        return self.name[:30]
-
-
-class ServiceCategory(BaseModel):
-    name = models.CharField(
-        'Наименование категории услуги',
-        max_length=const.CATEGOTY_NAME_MAX_LEN
-    )
-
-    def __str__(self):
-        return self.name[:30]
-
-
-class Service(BaseModel):
-    name = models.CharField('Наименование услуги', max_length=const.SERVICE_NAME_MAX_LEN)
-    service_description = models.CharField('Описание услуги', max_length=const.SERVICE_DESCRIP_MAX_LEN)
-    price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Стоимость услуги')
-    #TODO not sure: 1 to many or many to many?
-    category = models.ForeignKey(ProductCategory, on_delete=models.CASCADE)
-    seller = models.ForeignKey(User, on_delete=models.CASCADE)
-
-    class Meta:
-        verbose_name = 'Услуга'
-        verbose_name_plural = 'Услуги'
-        default_related_name = 'services'
-
-    def __str__(self):
-        return self.name
-
-
-#class Activities(models.Model):
-#    name = models.CharField(max_length=255, verbose_name="Вид деятельности")
-#    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-#    service = models.ForeignKey(Service, on_delete=models.CASCADE)
-#
-#    def __str__(self):
-#        return self.name
-
-
-class Order(models.Model):
-    user = models.ForeignKey(User, on_delete=models.PROTECT)
-    products = models.ManyToManyField(Product, through="OrderItem")
-    order_date = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"Заказ {self.id}"
-
-    def get_total_cost(self):
-        total_cost = sum(item.get_cost() for item in self.items.all())
-        return total_cost - total_cost * (self.discount / Decimal('100'))
-
-
-class OrderItem(models.Model):
-    order = models.ForeignKey(Order, related_name="items", on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, related_name="order_items", on_delete=models.CASCADE)
-    quantity = models.PositiveIntegerField(verbose_name="Количество", default=1)
-    price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Стоимость товара")
-    service = models.ForeignKey(Service, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return f"Заказ {self.order.id}, товар {self.product}"
-
-
-class Review(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="reviews")
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    text = models.TextField(verbose_name="Текст отзыва")
-    rating = models.PositiveIntegerField(verbose_name="Рейтинг")
-
-    def __str__(self):
-        return f"Отзыв на товар {self.product.name}"
