@@ -23,6 +23,7 @@ INSTALLED_APPS = [
 
     'rest_framework_simplejwt',
     'drf_spectacular',
+    'corsheaders',
 
     'users',
 ]
@@ -30,6 +31,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -114,6 +116,8 @@ MEDIA_ROOT = BASE_DIR / 'mediafiles'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'users.UserProfile'
+
+CORS_ALLOWED_ALL_ORIGINS = True
 
 EMAIL_BACKEND = os.getenv('EMAIL_BACKEND')
 EMAIL_HOST = os.getenv('EMAIL_HOST')
