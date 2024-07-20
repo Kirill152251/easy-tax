@@ -66,7 +66,8 @@ def test_confirm_code_success(
 
 
 @pytest.mark.django_db
-def test_signup_already_active(client, active_user, signup_url, signup_body):
+@pytest.mark.usefixtures('active_user')
+def test_signup_already_active(client, signup_url, signup_body):
     response = client.post(signup_url, data=signup_body)
     assert User.objects.count() == 1
     assert response.status_code == status.HTTP_202_ACCEPTED
@@ -120,12 +121,32 @@ def test_updated_user_after_new_confirm_code(
 ):
     new_first_name = 'аоыда'
     new_last_name = 'афдодф'
-    client.post(signup_url, data=signup_body)
+    client.post(signup_url, data=signup_body, content_type='application/json')
     updated_body = signup_body.copy()
     updated_body['first_name'] = new_first_name
     updated_body['last_name'] = new_last_name
+    client.post(signup_url, data=updated_body, content_type='application/json')
 
     user = User.objects.all().first()
     assert user.first_name == new_first_name
     assert user.last_name == new_last_name
     assert user.patronymic == signup_body['patronymic']
+
+
+@pytest.mark.django_db
+def test_double_reg(
+    client,
+    signup_url,
+):
+    test_body = {
+        "email": "rqo70851@zccck.com",
+        "password": "jgjkdf+Hj8",
+        "first_name": "Андрияна",
+        "last_name": "Петрова",
+        "patronymic": "Олеговна",
+        "secret_word": "словушко"
+    }
+    client.post(signup_url, data=test_body, content_type='application/json')
+    response = client.post(signup_url, data=test_body, content_type='application/json')
+    print(response.headers)
+    assert response.status_code == status.HTTP_201_CREATED

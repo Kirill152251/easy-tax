@@ -9,13 +9,14 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework import status, serializers
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.generics import CreateAPIView
+from rest_framework.generics import CreateAPIView, RetrieveAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from core.const import CONFIRM_CODE_EXPIRATION_TIME_MIN
+from core.permissions import IsActive
 from easy_tax_api.serializers import DetailSerializer
-from users.serializers import SignupSerializer, UserSerializer
+from users.serializers import SignupSerializer, UserGetSerializer 
 from users.models import SignupSession
 
 
@@ -72,7 +73,7 @@ class SignupAPIView(CreateAPIView):
             if is_active:
                 return Response(status=status.HTTP_202_ACCEPTED)
             else:
-                User.objects.filter(email=email).update(**request.data.dict())
+                User.objects.filter(email=email).update(**request.data)
 
         conf_code = randint(100000, 999999)
         session = SignupSession(
@@ -95,7 +96,7 @@ class SignupAPIView(CreateAPIView):
     tags=['Signup'],
     responses={
         status.HTTP_200_OK: OpenApiResponse(
-            response=UserSerializer,
+            response=UserGetSerializer,
             description='Пользователь активирован успешно.'
         ),
         status.HTTP_400_BAD_REQUEST: OpenApiResponse(
@@ -139,4 +140,13 @@ def confirm_code(request, code, confirm_code_id):
     user = User.objects.get(email=session.email)
     user.is_active = True
     user.save()
-    return Response(data=UserSerializer(user).data, status=status.HTTP_200_OK)
+    return Response(data=UserGetSerializer(user).data, status=status.HTTP_200_OK)
+
+
+class GetUserAPIView(RetrieveAPIView):
+    serializer_class = UserGetSerializer
+    permission_classes = (IsActive,)
+
+    def get(self, request, *args, **kwargs):
+        serializer = self.get_serializer(request.user)
+        return Response(serializer.data) 

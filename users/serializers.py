@@ -12,7 +12,7 @@ User = get_user_model()
 pwd_context = CryptContext(schemes=['bcrypt'])
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserGetSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = (
@@ -21,6 +21,11 @@ class UserSerializer(serializers.ModelSerializer):
             'first_name',
             'last_name',
             'patronymic',
+            'unp',
+            'registration_address',
+            'residential_address',
+            'date_of_birth',
+            'avatar'
         )
 
 

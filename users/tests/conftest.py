@@ -3,6 +3,9 @@ from django.core import mail
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.test import Client
+from rest_framework.test import APIRequestFactory
+
+from users.views import GetUserAPIView
 
 
 User = get_user_model()
@@ -14,8 +17,23 @@ def client():
 
 
 @pytest.fixture
+def factory():
+    return APIRequestFactory()
+
+
+@pytest.fixture
+def get_view():
+    return GetUserAPIView.as_view()
+
+
+@pytest.fixture
 def signup_url():
     return reverse('users:signup')
+
+
+@pytest.fixture
+def get_user_url():
+    return reverse('users:get_user')
 
 
 @pytest.fixture
@@ -29,18 +47,16 @@ def signup_body():
         "secret_word": "слово"
     }
 
+@pytest.fixture
+def active_user(signup_body):
+    user = User(**signup_body)
+    user.is_active = True
+    user.save()
+    return user 
+
 
 @pytest.fixture
-def inactive_user(client, signup_url, signup_body):
-    client.post(signup_url, data=signup_body)
-    return User.objects.get(email=signup_body['email'])
-
-
-@pytest.fixture
-def active_user(client, signup_url, signup_body):
-    response = client.post(signup_url, data=signup_body)
-    confirm_code_id = response.data['confirm_code_id']
-    email_massage = mail.outbox[0].body
-    code = ''.join(d for d in email_massage if d.isdigit())
-    client.post(reverse('users:confirm_code', args=(code, confirm_code_id)))
-    return User.objects.get(email=signup_body['email'])
+def inactive_user(signup_body):
+    user = User(**signup_body)
+    user.save()
+    return user 
