@@ -1,6 +1,7 @@
 from uuid import uuid4
 
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
+from django.core.validators import FileExtensionValidator
 from django.db import models
 
 from core import const
@@ -24,6 +25,10 @@ class UserProfileManager(BaseUserManager):
         user.is_active = True
         user.save()
         return user
+
+
+def avatar_upload_to(instance, filename):
+    return 'users_avatars/{0}/{1}'.format(instance.id, filename)
 
 
 class UserProfile(AbstractBaseUser, PermissionsMixin):
@@ -55,7 +60,12 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
         blank=True,
         null=True
     )
-    avatar = models.ImageField(upload_to='users_avatars', null=True, blank=True)
+    avatar = models.ImageField(
+        upload_to=avatar_upload_to,
+        null=True,
+        blank=True,
+        validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png'])]
+    )
     date_of_birth = models.DateField(blank=True, null=True)
     secret_word = models.CharField(blank=True, null=True)
     created_at = models.DateField(auto_now_add=True)

@@ -1,4 +1,6 @@
+import os
 import re
+
 from django.contrib.auth import get_user_model
 from email_validator import validate_email, EmailNotValidError
 from rest_framework import serializers
@@ -6,10 +8,52 @@ from rest_framework.validators import UniqueValidator
 from passlib.context import CryptContext
 
 from core import const
+from users.mixins import UserValidationMixin
 
 
 User = get_user_model()
 pwd_context = CryptContext(schemes=['bcrypt'])
+
+
+class UpdateUserSerializer(
+    serializers.ModelSerializer,
+    UserValidationMixin
+):
+    registration_address = serializers.CharField(
+        max_length=const.ADDRESS_MAX_LEN,
+    )
+    residential_address = serializers.CharField(
+        max_length=const.ADDRESS_MAX_LEN,
+    )
+
+    class Meta:
+        model = User
+        fields = (
+            'email',
+            'first_name',
+            'last_name',
+            'patronymic',
+            'unp',
+            'registration_address',
+            'residential_address',
+            'date_of_birth',
+        )
+
+
+class UploadAvatarSerializer(serializers.ModelSerializer):
+    avatar = serializers.ImageField(
+        allow_empty_file=True,
+        max_length=200
+    )
+
+    class Meta:
+        model = User
+        fields = ('avatar',)
+
+    def update(self, instance, validated_data):
+        if os.path.exists(instance.avatar.path):
+            os.remove(instance.avatar.path)
+        return super().update(instance, validated_data)
 
 
 class UserGetSerializer(serializers.ModelSerializer):
@@ -29,27 +73,7 @@ class UserGetSerializer(serializers.ModelSerializer):
         )
 
 
-class SignupSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(
-        validators=[UniqueValidator(queryset=User.objects.all())]
-    )
-    first_name = serializers.CharField(
-        min_length=const.FIRST_NAME_MIN_LEN,
-        max_length=const.FIRST_NAME_MAX_LEN,
-        trim_whitespace=False
-    )
-    last_name = serializers.CharField(
-        min_length=const.LAST_NAME_MIN_LEN,
-        max_length=const.LAST_NAME_MAX_LEN,
-        trim_whitespace=False
-    )
-    patronymic = serializers.CharField(
-        min_length=const.PATRONYMIC_MIN_LEN,
-        max_length=const.PATRONYMIC_MAX_LEN,
-        required=False,
-        trim_whitespace=False,
-        allow_blank=True
-    )
+class SignupSerializer(serializers.ModelSerializer, UserValidationMixin):
     password = serializers.CharField(
         min_length=const.PASSWORD_MIN_LEN,
         max_length=const.PASSWORD_MAX_LEN,
@@ -111,32 +135,3 @@ class SignupSerializer(serializers.ModelSerializer):
         ):
             raise serializers.ValidationError('Invalid password')
         return validated_data
-
-    def fio_validation(self, string, error_msg):
-        if (
-            re.fullmatch(pattern=const.FIO_REGEX, string=string) is None or
-            '--' in string or
-            string == '-'
-        ):
-            raise serializers.ValidationError(error_msg)
-
-    def validate_first_name(self, validated_data):
-        self.fio_validation(validated_data, 'Invalid first name')
-        return validated_data
-
-    def validate_last_name(self, validated_data):
-        self.fio_validation(validated_data, 'Invalid last name')
-        return validated_data
-
-    def validate_patronymic(self, validated_data):
-        if validated_data == '':
-            return None
-        self.fio_validation(validated_data, 'Invalid patronymic')
-        return validated_data
-
-    def validate_email(self, validated_data):
-        try:
-            email_info = validate_email(validated_data, check_deliverability=True)
-            return email_info.normalized
-        except EmailNotValidError as e:
-            raise serializers.ValidationError(e)

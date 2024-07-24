@@ -1,3 +1,4 @@
+import os
 from random import randint
 
 from drf_spectacular.utils import extend_schema, inline_serializer, OpenApiResponse
@@ -9,14 +10,22 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework import status, serializers
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.generics import CreateAPIView, RetrieveAPIView
+from rest_framework.generics import CreateAPIView
+from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+
+from rest_framework.views import APIView
 
 from core.const import CONFIRM_CODE_EXPIRATION_TIME_MIN
 from core.permissions import IsActive
 from easy_tax_api.serializers import DetailSerializer
-from users.serializers import SignupSerializer, UserGetSerializer 
+from users.serializers import (
+    SignupSerializer,
+    UserGetSerializer,
+    UpdateUserSerializer,
+    UploadAvatarSerializer
+)
 from users.models import SignupSession
 
 
@@ -143,10 +152,45 @@ def confirm_code(request, code, confirm_code_id):
     return Response(data=UserGetSerializer(user).data, status=status.HTTP_200_OK)
 
 
-class GetUserAPIView(RetrieveAPIView):
-    serializer_class = UserGetSerializer
-    permission_classes = (IsActive,)
+class UserGetUpdateAPIView(APIView):
+    permission_classes = [IsActive]
 
-    def get(self, request, *args, **kwargs):
-        serializer = self.get_serializer(request.user)
-        return Response(serializer.data) 
+    def get(self, request):
+        return Response(UserGetSerializer(request.user).data, status=status.HTTP_200_OK)
+
+    def patch(self, request):
+        serializer = UpdateUserSerializer(
+            request.user,
+            data=request.data,
+            partial=True
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class UserAvatarAPIView(APIView):
+    permission_classes = [IsActive]
+    parser_classes = [MultiPartParser, FormParser] 
+    
+    def post(self, request):
+        serializer = UploadAvatarSerializer(
+            request.user,
+            data=request.data
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(UserGetSerializer(request.user).data, status=status.HTTP_200_OK)
+    
+    def delete(self, request):
+        user = request.user
+        if os.path.exists(user.avatar.path):
+            os.remove(user.avatar.path)
+        else:
+            return Response(
+                DetailSerializer({'details': 'Coudn\'t find the file'}).data,
+                status=status.HTTP_404_NOT_FOUND
+            )
+        user.avatar = None
+        user.save()
+        return Response(UserGetSerializer(request.user).data, status=status.HTTP_200_OK)
