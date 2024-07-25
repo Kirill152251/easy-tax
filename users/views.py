@@ -78,11 +78,14 @@ class SignupAPIView(CreateAPIView):
             serializer.is_valid(raise_exception=True)
             self.perform_create(serializer)
         else:
-            is_active = User.objects.get(email=email).is_active
-            if is_active:
+            user = User.objects.get(email=email)
+            if user.is_active:
                 return Response(status=status.HTTP_202_ACCEPTED)
             else:
-                User.objects.filter(email=email).update(**request.data)
+                user.delete()
+                serializer = self.get_serializer(data=request.data)
+                serializer.is_valid(raise_exception=True)
+                self.perform_create(serializer)
 
         conf_code = randint(100000, 999999)
         session = SignupSession(

@@ -141,6 +141,7 @@ def test_double_reg(
     test_body = {
         "email": "rqo70851@zccck.com",
         "password": "jgjkdf+Hj8",
+        "repeat_password": "jgjkdf+Hj8",
         "first_name": "Андрияна",
         "last_name": "Петрова",
         "patronymic": "Олеговна",
@@ -148,5 +149,4 @@ def test_double_reg(
     }
     client.post(signup_url, data=test_body, content_type='application/json')
     response = client.post(signup_url, data=test_body, content_type='application/json')
-    print(response.headers)
     assert response.status_code == status.HTTP_201_CREATED
