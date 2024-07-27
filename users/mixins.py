@@ -11,7 +11,7 @@ from core import const
 User = get_user_model()
 
 
-class UserValidationMixin:
+class UserValidationMixin(metaclass=serializers.SerializerMetaclass):
     email = serializers.EmailField(
         validators=[UniqueValidator(queryset=User.objects.all())]
     )
@@ -29,8 +29,8 @@ class UserValidationMixin:
         min_length=const.PATRONYMIC_MIN_LEN,
         max_length=const.PATRONYMIC_MAX_LEN,
         required=False,
-        trim_whitespace=False,
-        allow_blank=True
+        allow_blank=True,
+        trim_whitespace=False
     )
 
     def fio_validation(self, string, error_msg):
@@ -47,13 +47,13 @@ class UserValidationMixin:
 
     def validate_last_name(self, value):
         self.fio_validation(value, 'Invalid last name')
-        return value 
+        return value
 
     def validate_patronymic(self, value):
         if value == '':
             return None
         self.fio_validation(value, 'Invalid patronymic')
-        return value 
+        return value
 
     def validate_email(self, value):
         try:

@@ -16,8 +16,8 @@ pwd_context = CryptContext(schemes=['bcrypt'])
 
 
 class UpdateUserSerializer(
+    UserValidationMixin,
     serializers.ModelSerializer,
-    UserValidationMixin
 ):
     registration_address = serializers.CharField(
         max_length=const.ADDRESS_MAX_LEN,
@@ -41,10 +41,7 @@ class UpdateUserSerializer(
 
 
 class UploadAvatarSerializer(serializers.ModelSerializer):
-    avatar = serializers.ImageField(
-        allow_empty_file=True,
-        max_length=200
-    )
+    avatar = serializers.ImageField(max_length=200)
 
     class Meta:
         model = User
@@ -73,15 +70,17 @@ class UserGetSerializer(serializers.ModelSerializer):
         )
 
 
-class SignupSerializer(serializers.ModelSerializer, UserValidationMixin):
+class SignupSerializer(UserValidationMixin, serializers.ModelSerializer):
     password = serializers.CharField(
         min_length=const.PASSWORD_MIN_LEN,
         max_length=const.PASSWORD_MAX_LEN,
+        write_only=True,
         trim_whitespace=False
     )
     secret_word = serializers.CharField(
         min_length=const.SECRETWORD_MIN_LEN,
         max_length=const.SECRETWORD_MAX_LEN,
+        write_only=True,
         trim_whitespace=False
     )
 
@@ -97,8 +96,6 @@ class SignupSerializer(serializers.ModelSerializer, UserValidationMixin):
             'secret_word'
         )
         extra_kwargs = {
-            'password': {'write_only': True},
-            'secret_word': {'write_only': True},
             'id': {'read_only': True}
         }
 

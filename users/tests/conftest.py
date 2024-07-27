@@ -34,7 +34,7 @@ def signup_url():
 
 @pytest.fixture
 def user_me_url():
-    return reverse('users:user_me') 
+    return reverse('users:user_me')
 
 
 @pytest.fixture
@@ -70,7 +70,7 @@ def partial_update_body():
         'last_name': 'новаяфамилия',
         'patronymic': 'отчество',
         'registration_address': 'аофдлаофда',
-        'date_of_birth': now().date() 
+        'date_of_birth': now().date()
     }
 
 
@@ -79,11 +79,11 @@ def active_user(signup_body):
     user = User(**signup_body)
     user.is_active = True
     user.save()
-    return user 
+    return user
 
 
 @pytest.fixture
 def inactive_user(signup_body):
     user = User(**signup_body)
     user.save()
-    return user 
+    return user

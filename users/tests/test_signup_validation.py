@@ -11,13 +11,28 @@ User = get_user_model()
     'param,value',
     [
         ('first_name', 'плаыдфаф '),
-        ('last_name', ' плаы дфаф'),
+        ('last_name', ' плаыдфаф'),
         ('patronymic', 'плаы дфаф'),
         ('password', ' 123 Kdf032 '),
         ('secret_word', ' плаы дфаф '),
     ]
 )
 def test_invalid_params_contain_space(client, signup_url, signup_body, param, value):
+    signup_body[param] = value
+    response = client.post(signup_url, data=signup_body)
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    'param,value',
+    [
+        ('first_name', 'плаыдфафдддддддддддддддддддддддддддддддддддддддддддддддд'),
+        ('last_name', 'плаыдфафффффффффффффффффффффффффффффффффффффффффффффф'),
+        ('patronymic', 'плаыдфафффффффффффффффффффффффффффффффффффффффффффффффффф'),
+    ]
+)
+def test_fio_max_len(client, signup_url, signup_body, param, value):
     signup_body[param] = value
     response = client.post(signup_url, data=signup_body)
     assert response.status_code == status.HTTP_400_BAD_REQUEST
