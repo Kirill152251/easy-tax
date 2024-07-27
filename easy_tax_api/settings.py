@@ -120,6 +120,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'users.UserProfile'
 
+CSRF_TRUSTED_ORIGINS = [os.getenv('CRSF_TRUSTED')]
+
 CORS_ALLOW_ALL_ORIGINS = True
 
 EMAIL_BACKEND = os.getenv('EMAIL_BACKEND')
