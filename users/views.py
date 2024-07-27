@@ -158,10 +158,27 @@ def confirm_code(request, code, confirm_code_id):
 class UserGetUpdateAPIView(APIView):
     permission_classes = [IsActive]
 
+    @extend_schema(
+        tags=['users/me/'],
+        responses=UserGetSerializer
+    )
     def get(self, request):
+        """
+        Получение данных аутентифицированного пользователя. Права доступа:
+        аутентифицированный активный пользователь.
+        """
         return Response(UserGetSerializer(request.user).data, status=status.HTTP_200_OK)
 
+    @extend_schema(
+        tags=['users/me/'],
+        responses=UserGetSerializer,
+        request=UpdateUserSerializer
+    )
     def patch(self, request):
+        """
+        Изменение данных аутентифицированного пользователя. Права доступа:
+        аутентифицированный активный пользователь.
+        """
         serializer = UpdateUserSerializer(
             request.user,
             data=request.data,
@@ -169,14 +186,23 @@ class UserGetUpdateAPIView(APIView):
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(UserGetSerializer(request.user).data, status=status.HTTP_200_OK)
 
 
 class UserAvatarAPIView(APIView):
     permission_classes = [IsActive]
-    parser_classes = [MultiPartParser, FormParser] 
-    
+    parser_classes = [MultiPartParser, FormParser]
+
+    @extend_schema(
+        tags=['users/me/'],
+        responses=UserGetSerializer,
+        request=UploadAvatarSerializer
+    )
     def post(self, request):
+        """
+        Установка/обновление аватара пользователя. Права доступа:
+        аутентифицированный активный пользователь.
+        """
         serializer = UploadAvatarSerializer(
             request.user,
             data=request.data
@@ -184,8 +210,18 @@ class UserAvatarAPIView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(UserGetSerializer(request.user).data, status=status.HTTP_200_OK)
-    
+
+    @extend_schema(
+        tags=['users/me/'],
+        responses={
+            status.HTTP_200_OK: OpenApiResponse(response=UserGetSerializer)
+        }
+    )
     def delete(self, request):
+        """
+        Удаление аватара пользователя. Права доступа:
+        аутентифицированный активный пользователь.
+        """
         user = request.user
         if os.path.exists(user.avatar.path):
             os.remove(user.avatar.path)
