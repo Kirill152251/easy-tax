@@ -18,6 +18,8 @@ services:
     command: sh -c 'python manage.py runserver 0.0.0.0:8000'
     ports:
       - 8000:8000
+    stdin_open: true
+    tty: true
 
 volumes:
   postgres_data_dev:

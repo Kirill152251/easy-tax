@@ -21,15 +21,20 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'rest_framework',
     'rest_framework_simplejwt',
     'drf_spectacular',
+    'corsheaders',
 
+    'core',
+    'products',
     'users',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -93,7 +98,7 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=600),
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
@@ -107,11 +112,17 @@ USE_TZ = True
 
 
 STATIC_URL = '/static/'
+MEDIA_URL = '/media/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+MEDIA_ROOT = BASE_DIR / 'mediafiles'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'users.UserProfile'
+
+CSRF_TRUSTED_ORIGINS = [os.getenv('CRSF_TRUSTED')]
+
+CORS_ALLOW_ALL_ORIGINS = True
 
 EMAIL_BACKEND = os.getenv('EMAIL_BACKEND')
 EMAIL_HOST = os.getenv('EMAIL_HOST')

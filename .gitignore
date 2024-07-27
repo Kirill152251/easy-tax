@@ -130,3 +130,5 @@ dmypy.json
 .history/
 
 .mypy_cache
+
+mediafiles/

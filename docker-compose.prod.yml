@@ -12,6 +12,7 @@ services:
       dockerfile: Dockerfile.prod
     volumes:
       - static_volume:/home/app/api/staticfiles
+      - media_volume:/home/app/api/mediadiles
     env_file:
       - .env.prod
     depends_on:
@@ -26,9 +27,11 @@ services:
       - 1337:80
     volumes:
       - static_volume:/home/app/api/staticfiles
+      - media_volume:/home/app/api/mediadiles
     depends_on:
       - app
 
 volumes:
   postgres_data:
   static_volume:
+  media_volume:
