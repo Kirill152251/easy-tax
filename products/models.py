@@ -45,5 +45,5 @@ class Product(BaseModel):
 
 
 class ProductImage(BaseModel):
-    avatar = models.ImageField(upload_to='products_images', validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png'])])
+    photo = models.ImageField(upload_to='products_images', validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png'])])
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')

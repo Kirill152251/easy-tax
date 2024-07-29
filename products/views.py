@@ -1,49 +1,31 @@
-from django.shortcuts import render
-from rest_framework import generics
 from .models import ProductCategory, Product, ProductImage
 from .serializers import (
                         ProductCategorySerializer,
                         ProductSerializer,
                         ProductImageSerializer,
                         )
+from drf_spectacular.utils import extend_schema
+from rest_framework import viewsets
 
 
-class ProductCategoryListAPIView(generics.ListAPIView):
-    """
-    API-представление для получения списка категорий товаров.
-    """
+class ProductCategoryViewSet(viewsets.ModelViewSet):
     queryset = ProductCategory.objects.all()
     serializer_class = ProductCategorySerializer
 
-
-class ProductListAPIView(generics.ListCreateAPIView):
-    """
-    API-представление для получения списка товаров или создания нового товара.
-    """
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializer
-
-
-class ProductDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
-    """
-    API-представление для получения, обновления или удаления товара.
-    """
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializer
+    @extend_schema(
+        description="Get a list of product categories.",
+        responses={200: "List of product categories"},
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
 
-class ProductImageListAPIView(generics.ListCreateAPIView):
-    """
-    API-представление для получения списка изображений товаров или создания нового изображения.
-    """
+class ProductImageViewSet(viewsets.ModelViewSet):
     queryset = ProductImage.objects.all()
     serializer_class = ProductImageSerializer
 
 
-class ProductImageDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
-    """
-    API-представление для получения, обновления или удаления изображения товара.
-    """
-    queryset = ProductImage.objects.all()
-    serializer_class = ProductImageSerializer
+class ProductViewSet(viewsets.ModelViewSet):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
     

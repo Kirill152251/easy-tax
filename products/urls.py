@@ -1,24 +1,13 @@
-from django.urls import path
-from .views import (
-    ProductCategoryListAPIView,
-    ProductListAPIView,
-    ProductDetailAPIView,
-    ProductImageListAPIView,
-    ProductImageDetailAPIView,
-)
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import ProductCategoryViewSet, ProductImageViewSet, ProductViewSet
 
 
-app_name = 'products'
+router = DefaultRouter()
+router.register(r'product-categories', ProductCategoryViewSet)
+router.register(r'product-images', ProductImageViewSet)
+router.register(r'products', ProductViewSet)
 
 urlpatterns = [
-    # Маршруты для ProductCategory
-    path('categories/', ProductCategoryListAPIView.as_view(), name='product-category-list'),
-
-    # Маршруты для Product
-    path('products/', ProductListAPIView.as_view(), name='product-list'),
-    path('products/<int:pk>/', ProductDetailAPIView.as_view(), name='product-detail'),
-
-    # Маршруты для ProductImage
-    path('product-images/', ProductImageListAPIView.as_view(), name='product-image-list'),
-    path('product-images/<int:pk>/', ProductImageDetailAPIView.as_view(), name='product-image-detail'),
+    path('', include(router.urls)),
 ]
