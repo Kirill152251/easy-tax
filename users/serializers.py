@@ -48,8 +48,6 @@ class UploadAvatarSerializer(serializers.ModelSerializer):
         fields = ('avatar',)
 
     def update(self, instance, validated_data):
-        if os.path.exists(instance.avatar.path):
-            os.remove(instance.avatar.path)
         return super().update(instance, validated_data)
 
 

@@ -14,4 +14,7 @@ url_v1 = [
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/dev/', include(url_v1))
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
