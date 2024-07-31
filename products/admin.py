@@ -13,10 +13,10 @@ class ProductCategoryAdmin(admin.ModelAdmin):
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = ('name', 'description', 'price', 'count', 'category', 'seller',)
-    
+
     list_filter = ('name', 'description', 'price', 'count', 'category', 'seller',)
     search_fields = ('name', 'category', 'seller',)
-    ordering = ( '-category', '-seller',)
+    ordering = ('-category', '-seller',)
     list_per_page = 25
 
 
@@ -28,4 +28,3 @@ class ProductImageAdmin(admin.ModelAdmin):
     ordering = ('photo', 'product',)
     readonly_fields = ('photo', 'product',)
     list_per_page = 10
-    
