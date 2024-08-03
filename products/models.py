@@ -12,7 +12,7 @@ User = get_user_model()
 class ProductCategory(BaseModel):
     name = models.CharField(
         'Наименование категории товара',
-        max_length=const.CATEGOTY_NAME_MAX_LEN
+        max_length=500,
     )
 
     class Meta:
@@ -24,7 +24,7 @@ class ProductCategory(BaseModel):
 
 
 class Product(BaseModel):
-    name = models.CharField('Наименование товара', max_length=const.PRODUCT_NAME_MAX_LEN)
+    name = models.CharField('Наименование товара', max_length=500)
     description = models.CharField('Описание товара', max_length=const.PRODUCT_DESCRIP_MAX_LEN)
     price = models.DecimalField('Стоимость товара', max_digits=10, decimal_places=2, validators=[MinValueValidator(0)])
     count = models.PositiveIntegerField(
