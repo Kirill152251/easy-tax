@@ -1,0 +1,62 @@
+name: Lint and testing
+on:
+  push:
+    branches: [ 'dev' ]
+  pull_request:
+    branches: [ 'dev' ]
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    name: Lint flake8
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Flake8 lint
+        run: |
+          pip install --upgrade pip;
+          pip install flake8;
+          flake8 --ignore=E501,F401,W503,W504 .
+  test:
+    name: Testing
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DEBUG: 1
+      SECRET_KEY: ${{ secrets.SECRET_KEY }} 
+      DJANGO_ALLOWED_HOSTS: localhost 127.0.0.1 [::1]
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+      POSTGRES_HOST: localhost
+      POSTGRES_PORT: 5432
+      EMAIL_BACKEND: django.core.mail.backends.console.EmailBackend
+      DATABASE: postgres
+      CRSF_TRUSTED: ${{ secrets.CRSF_TRUSTED }} 
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Make migrations
+        run: python manage.py migrate
+      - name: Run tests
+        run: pytest
