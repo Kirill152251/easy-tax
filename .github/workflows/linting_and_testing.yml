@@ -1,9 +1,8 @@
-name: Lint and testing
+name: Linting and testing
 on:
-  push:
-    branches: [ 'dev' ]
   pull_request:
-    branches: [ 'dev' ]
+    branches: [ 'master', 'dev' ]
+  workflow_dispatch:
 jobs:
   lint:
     runs-on: ubuntu-latest
