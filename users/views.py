@@ -24,7 +24,8 @@ from users.serializers import (
     SignupSerializer,
     UserGetSerializer,
     UpdateUserSerializer,
-    UploadAvatarSerializer
+    UploadAvatarSerializer,
+    ConfirmCodeIDSerializer
 )
 from users.models import SignupSession
 
@@ -69,13 +70,11 @@ class SignupAPIView(CreateAPIView):
         }
     )
     def post(self, request):
-        if not request.data.get('email', None):
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-        email = request.data['email']
+        email = serializer.validated_data['email']
         if not User.objects.filter(email=email).exists():
-            serializer = self.get_serializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
             self.perform_create(serializer)
         else:
             user = User.objects.get(email=email)
@@ -83,8 +82,6 @@ class SignupAPIView(CreateAPIView):
                 return Response(status=status.HTTP_202_ACCEPTED)
             else:
                 user.delete()
-                serializer = self.get_serializer(data=request.data)
-                serializer.is_valid(raise_exception=True)
                 self.perform_create(serializer)
 
         conf_code = randint(100000, 999999)
@@ -101,7 +98,10 @@ class SignupAPIView(CreateAPIView):
             from_email=settings.EMAIL_HOST_USER,
             recipient_list=[email]
         )
-        return Response({'confirm_code_id': str(session.id)}, status=status.HTTP_201_CREATED)
+        return Response(
+            ConfirmCodeIDSerializer(session).data,
+            status=status.HTTP_201_CREATED
+        )
 
 
 @extend_schema(

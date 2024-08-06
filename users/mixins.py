@@ -57,7 +57,8 @@ class UserValidationMixin(metaclass=serializers.SerializerMetaclass):
 
     def validate_email(self, value):
         try:
-            email_info = validate_email(value, check_deliverability=True)
+            email = value.lower()
+            email_info = validate_email(email, check_deliverability=True)
             return email_info.normalized
         except EmailNotValidError as e:
             raise serializers.ValidationError(e)

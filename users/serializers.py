@@ -1,14 +1,12 @@
-import os
 import re
 
 from django.contrib.auth import get_user_model
-from email_validator import validate_email, EmailNotValidError
 from rest_framework import serializers
-from rest_framework.validators import UniqueValidator
 from passlib.context import CryptContext
 
 from core import const
 from users.mixins import UserValidationMixin
+from users.models import SignupSession
 
 
 User = get_user_model()
@@ -48,8 +46,6 @@ class UploadAvatarSerializer(serializers.ModelSerializer):
         fields = ('avatar',)
 
     def update(self, instance, validated_data):
-        if os.path.exists(instance.avatar.path):
-            os.remove(instance.avatar.path)
         return super().update(instance, validated_data)
 
 
@@ -70,7 +66,16 @@ class UserGetSerializer(serializers.ModelSerializer):
         )
 
 
+class ConfirmCodeIDSerializer(serializers.ModelSerializer):
+    confirm_code_id = serializers.UUIDField(read_only=True, source='id')
+
+    class Meta:
+        model = SignupSession
+        fields = ('confirm_code_id',)
+
+
 class SignupSerializer(UserValidationMixin, serializers.ModelSerializer):
+    email = serializers.EmailField()
     password = serializers.CharField(
         min_length=const.PASSWORD_MIN_LEN,
         max_length=const.PASSWORD_MAX_LEN,

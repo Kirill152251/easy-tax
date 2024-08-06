@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.core.validators import FileExtensionValidator, MinValueValidator
 
 from core import const
 from core.models import BaseModel
@@ -11,7 +12,7 @@ User = get_user_model()
 class ProductCategory(BaseModel):
     name = models.CharField(
         'Наименование категории товара',
-        max_length=const.CATEGOTY_NAME_MAX_LEN
+        max_length=500,
     )
 
     class Meta:
@@ -23,9 +24,9 @@ class ProductCategory(BaseModel):
 
 
 class Product(BaseModel):
-    name = models.CharField('Наименование товара', max_length=const.PRODUCT_NAME_MAX_LEN)
+    name = models.CharField('Наименование товара', max_length=500)
     description = models.CharField('Описание товара', max_length=const.PRODUCT_DESCRIP_MAX_LEN)
-    price = models.DecimalField('Стоимость товара', max_digits=10, decimal_places=2)
+    price = models.DecimalField('Стоимость товара', max_digits=10, decimal_places=2, validators=[MinValueValidator(0)])
     count = models.PositiveIntegerField(
         'Количество товара в наличии',
         null=True,
@@ -44,5 +45,10 @@ class Product(BaseModel):
 
 
 class ProductImage(BaseModel):
-    avatar = models.ImageField(upload_to='products_images')
+    photo = models.ImageField(upload_to='products_images', validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png'])])
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
+
+    class Meta:
+        verbose_name = 'Изображение'
+        verbose_name_plural = 'Изображения'
+        default_related_name = 'photos'
