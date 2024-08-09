@@ -20,5 +20,5 @@ jobs:
             docker ps
             git checkout master
             git pull
-            docker compose -f docker-compose.prod.yml up -d
+            docker compose -f docker-compose.prod.yml up -d --build
             docker ps
