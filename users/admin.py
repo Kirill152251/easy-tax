@@ -10,11 +10,24 @@ class CustomUserAdmin(UserAdmin):
     fieldsets = (
         (
             None,
-            {'fields': ['email', 'first_name', 'last_name', 'patronymic', 'is_active']}
+            {'fields': [
+                'email',
+                'first_name',
+                'last_name',
+                'patronymic',
+                'is_active',
+                'is_admin',
+                'unp',
+                'registration_address',
+                'residential_address',
+                'avatar',
+                'date_of_birth',
+            ]}
         ),
     )
     ordering = ('email',)
-    list_display = ('email',)
+    list_display = ('email', 'first_name', 'last_name', 'unp', 'is_active')
+    readonly_fields = ('id', 'created_at')
 
 
 admin.site.register(User, CustomUserAdmin)
