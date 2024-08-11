@@ -223,13 +223,5 @@ class UserAvatarAPIView(APIView):
         аутентифицированный активный пользователь.
         """
         user = request.user
-        if os.path.exists(user.avatar.path):
-            os.remove(user.avatar.path)
-        else:
-            return Response(
-                DetailSerializer({'details': 'Coudn\'t find the file'}).data,
-                status=status.HTTP_404_NOT_FOUND
-            )
-        user.avatar = None
-        user.save()
+        user.avatar.delete()
         return Response(UserGetSerializer(request.user).data, status=status.HTTP_200_OK)
