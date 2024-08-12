@@ -2,6 +2,7 @@ import re
 from typing import Any
 
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from passlib.context import CryptContext
@@ -38,6 +39,13 @@ class UpdateUserSerializer(
             'residential_address',
             'date_of_birth',
         )
+
+    def validate_date_of_birth(self, validated_data):
+        if validated_data > timezone.now().date():
+            raise serializers.ValidationError('Date of birth cannot be in future')
+        if timezone.now().date() - validated_data > timezone.timedelta(days=360*120):
+            raise serializers.ValidationError('The date is too old')
+        return validated_data
 
 
 class UploadAvatarSerializer(serializers.ModelSerializer):
