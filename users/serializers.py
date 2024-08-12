@@ -47,6 +47,11 @@ class UpdateUserSerializer(
             raise serializers.ValidationError('The date is too old')
         return validated_data
 
+    def validate_unp(self, validated_data):
+        if re.fullmatch(pattern=const.UNP_REGEX, string=validated_data) is None:
+            raise serializers.ValidationError('Invalid unp')
+        return validated_data
+
 
 class UploadAvatarSerializer(serializers.ModelSerializer):
     avatar = serializers.ImageField(max_length=200)
