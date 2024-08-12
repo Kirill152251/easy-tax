@@ -1,7 +1,9 @@
 import re
+from typing import Any
 
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from passlib.context import CryptContext
 
 from core import const
@@ -137,3 +139,14 @@ class SignupSerializer(UserValidationMixin, serializers.ModelSerializer):
         ):
             raise serializers.ValidationError('Invalid password')
         return validated_data
+
+
+class EmailLowercaseTokenObtainPairSerializer(TokenObtainPairSerializer):
+
+    def validate(self, attrs: dict[str, Any]) -> dict[str, str]:
+        try:
+            email_lowercase = attrs[self.username_field].lower()
+            attrs[self.username_field] = email_lowercase
+        except AttributeError:
+            pass
+        return super().validate(attrs)
