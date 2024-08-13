@@ -121,7 +121,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'users.UserProfile'
 
-CSRF_TRUSTED_ORIGINS = [os.getenv('CRSF_TRUSTED')]
+if os.getenv('CRSF_TRUSTED'):
+    CSRF_TRUSTED_ORIGINS = os.getenv('CRSF_TRUSTED').split(' ')
 
 CORS_ALLOW_ALL_ORIGINS = True
 

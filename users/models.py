@@ -1,7 +1,7 @@
 from uuid import uuid4
 
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
-from django.core.validators import FileExtensionValidator
+from django.core.validators import FileExtensionValidator, RegexValidator
 from django.db import models
 
 from core import const
@@ -66,6 +66,29 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
         null=True,
         blank=True,
         validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png'])]
+    )
+    passport_num_regex = RegexValidator(
+        regex=const.PASSWORD_NUM_REGEX,
+        message='Incorrect passport number format'
+    )
+    passport_num = models.CharField(
+        'Номер паспорта',
+        validators=[passport_num_regex],
+        blank=True,
+        null=True,
+        max_length=const.PASSPORT_NUM_LEN,
+        unique=True
+    )
+    phone_regex = RegexValidator(
+        regex=const.PHONE_NUMBER_REGEX_BY,
+        message='Incorrect phone format. Correct format: +375*********'
+    )
+    phone_number = models.CharField(
+        'Мобильный номер',
+        validators=[phone_regex],
+        unique=True,
+        blank=True,
+        null=True
     )
     date_of_birth = models.DateField(blank=True, null=True)
     secret_word = models.CharField(blank=True, null=True)
