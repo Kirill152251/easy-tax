@@ -152,7 +152,7 @@ def test_date_of_birth_patch(
     [
         ('FAL349A4L', status.HTTP_200_OK),
         ('999225345', status.HTTP_200_OK),
-        ('PFAMUKRFQ', status.HTTP_200_OK),
+        ('PFAMUKRFQ', status.HTTP_400_BAD_REQUEST),
         ('', status.HTTP_400_BAD_REQUEST),
         ('FALJ30ALJF92A', status.HTTP_400_BAD_REQUEST),
         ('FALK20VA', status.HTTP_400_BAD_REQUEST),
