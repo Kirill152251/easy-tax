@@ -43,7 +43,7 @@ class UpdateUserSerializer(
     def validate_date_of_birth(self, validated_data):
         if validated_data > timezone.now().date():
             raise serializers.ValidationError('Date of birth cannot be in future')
-        if timezone.now().date() - validated_data > timezone.timedelta(days=360*120):
+        if timezone.now().date() - validated_data > timezone.timedelta(days=360 * 120):
             raise serializers.ValidationError('The date is too old')
         return validated_data
 
