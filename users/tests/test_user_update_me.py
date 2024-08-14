@@ -95,7 +95,6 @@ def test_params_contain_space(
     request = factory.patch(user_me_url, full_update_body)
     force_authenticate(request, user=active_user)
     response = user_me_view(request)
-    print(response.data)
     assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 
@@ -121,5 +120,54 @@ def test_fio_max_len(
     request = factory.patch(user_me_url, full_update_body)
     force_authenticate(request, user=active_user)
     response = user_me_view(request)
-    print(response.data)
     assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    'date,status',
+    [
+        ('2224-08-13', status.HTTP_400_BAD_REQUEST),
+        ('1904-08-11', status.HTTP_400_BAD_REQUEST),
+        ('2001-06-22', status.HTTP_200_OK),
+    ]
+)
+def test_date_of_birth_patch(
+    factory,
+    user_me_url,
+    active_user,
+    user_me_view,
+    date,
+    status
+):
+    request = factory.patch(user_me_url, {'date_of_birth': date})
+    force_authenticate(request, user=active_user)
+    response = user_me_view(request)
+    assert response.status_code == status
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    'value,status',
+    [
+        ('FAL349A4L', status.HTTP_200_OK),
+        ('999225345', status.HTTP_200_OK),
+        ('PFAMUKRFQ', status.HTTP_400_BAD_REQUEST),
+        ('', status.HTTP_400_BAD_REQUEST),
+        ('FALJ30ALJF92A', status.HTTP_400_BAD_REQUEST),
+        ('FALK20VA', status.HTTP_400_BAD_REQUEST),
+        ('afa932faa', status.HTTP_400_BAD_REQUEST),
+    ]
+)
+def test_unp_patch(
+    factory,
+    user_me_url,
+    active_user,
+    user_me_view,
+    value,
+    status
+):
+    request = factory.patch(user_me_url, {'unp': value})
+    force_authenticate(request, user=active_user)
+    response = user_me_view(request)
+    assert response.status_code == status
