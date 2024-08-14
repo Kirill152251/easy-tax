@@ -127,7 +127,7 @@ def test_fio_max_len(
 @pytest.mark.parametrize(
     'date,status',
     [
-        ('2024-08-13', status.HTTP_400_BAD_REQUEST),
+        ('2224-08-13', status.HTTP_400_BAD_REQUEST),
         ('1904-08-11', status.HTTP_400_BAD_REQUEST),
         ('2001-06-22', status.HTTP_200_OK),
     ]

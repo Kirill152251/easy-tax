@@ -56,7 +56,7 @@ def full_update_body():
         'first_name': 'новоеимя',
         'last_name': 'новаяфамилия',
         'patronymic': 'отчество',
-        'unp': '1751981489',
+        'unp': '123948734',
         'registration_address': 'аофдлаофда',
         'residential_address': 'оазфзоф',
         'date_of_birth': now().date()
