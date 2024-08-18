@@ -6,6 +6,7 @@ from .serializers import ProductCategorySerializer, ProductImageSerializer, Prod
 from drf_spectacular.utils import extend_schema
 
 
+@extend_schema(tags=['Product Categories'])
 class ProductCategoryViewSet(viewsets.ModelViewSet):
     queryset = ProductCategory.objects.all()
     serializer_class = ProductCategorySerializer
@@ -20,6 +21,7 @@ class ProductCategoryViewSet(viewsets.ModelViewSet):
         return super().list(request, *args, **kwargs)
 
 
+@extend_schema(tags=['Product Images'])
 class ProductImageViewSet(viewsets.ModelViewSet):
     queryset = ProductImage.objects.all()
     serializer_class = ProductImageSerializer
@@ -27,6 +29,7 @@ class ProductImageViewSet(viewsets.ModelViewSet):
     filterset_fields = ['product']
 
 
+@extend_schema(tags=['Products'])
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
