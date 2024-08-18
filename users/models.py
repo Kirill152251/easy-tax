@@ -68,7 +68,7 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
         validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png'])]
     )
     passport_num_regex = RegexValidator(
-        regex=const.PASSWORD_NUM_REGEX,
+        regex=const.PASSPORT_NUM_REGEX,
         message='Incorrect passport number format'
     )
     passport_num = models.CharField(

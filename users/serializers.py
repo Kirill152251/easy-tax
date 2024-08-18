@@ -37,6 +37,8 @@ class UpdateUserSerializer(
             'unp',
             'registration_address',
             'residential_address',
+            'passport_num',
+            'phone_number'
             'date_of_birth',
         )
 
@@ -52,6 +54,16 @@ class UpdateUserSerializer(
             raise serializers.ValidationError('Invalid unp')
         if re.fullmatch(pattern=const.UNP_REGEX, string=validated_data) is None:
             raise serializers.ValidationError('Invalid unp')
+        return validated_data
+
+    def validate_phone_number(self, validated_data):
+        if re.fullmatch(pattern=const.PHONE_NUMBER_REGEX_BY, string=validated_data) is None:
+            raise serializers.ValidationError('Invalid phone number')
+        return validated_data
+
+    def validate_passport_num(self, validated_data):
+        if re.fullmatch(pattern=const.PASSPORT_NUM_REGEX, string=validated_data) is None:
+            raise serializers.ValidationError('Invalid passport number')
         return validated_data
 
 
@@ -79,6 +91,8 @@ class UserGetSerializer(serializers.ModelSerializer):
             'registration_address',
             'residential_address',
             'date_of_birth',
+            'passport_num',
+            'phone_number'
             'avatar'
         )
 
