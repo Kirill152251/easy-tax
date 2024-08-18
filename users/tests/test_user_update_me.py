@@ -80,34 +80,12 @@ def test_full_update_me_success(
         ('first_name', ' фдадфаол'),
         ('last_name', ' плаыдфаф '),
         ('patronymic', ' плаыдфаф '),
+        ('first_name', 'фдадфаолллллллллллллллллллллллл'),
+        ('last_name', 'плаыдфафвввввввввввввввввввввввв'),
+        ('patronymic', 'плаыдфафйййййййййййййййййййййййо'),
     ]
 )
-def test_params_contain_space(
-    factory,
-    user_me_url,
-    user_me_view,
-    active_user,
-    full_update_body,
-    param,
-    value
-):
-    full_update_body[param] = value
-    request = factory.patch(user_me_url, full_update_body)
-    force_authenticate(request, user=active_user)
-    response = user_me_view(request)
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
-
-
-@pytest.mark.django_db
-@pytest.mark.parametrize(
-    'param,value',
-    [
-        ('first_name', 'фдадфаоллллллллллллллллллллллллллллллллллллллллллллллллллллллл'),
-        ('last_name', 'плаыдфафввввввввввввввввввввввввввввввввввввввввввввв'),
-        ('patronymic', 'плаыдфафййййййййййййййййййййййййййййййййййййййййййй'),
-    ]
-)
-def test_fio_max_len(
+def test_invalid_fio(
     factory,
     user_me_url,
     user_me_view,

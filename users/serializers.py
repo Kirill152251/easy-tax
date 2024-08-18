@@ -38,7 +38,7 @@ class UpdateUserSerializer(
             'registration_address',
             'residential_address',
             'passport_num',
-            'phone_number'
+            'phone_number',
             'date_of_birth',
         )
 
@@ -92,7 +92,7 @@ class UserGetSerializer(serializers.ModelSerializer):
             'residential_address',
             'date_of_birth',
             'passport_num',
-            'phone_number'
+            'phone_number',
             'avatar'
         )
 
