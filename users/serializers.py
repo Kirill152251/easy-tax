@@ -42,6 +42,16 @@ class UpdateUserSerializer(
             'date_of_birth',
         )
 
+    def validate_residential_address(self, validated_data):
+        if re.fullmatch(pattern=const.ADDRESS_REGEX, string=validated_data) is None:
+            raise serializers.ValidationError('Invalid registration address')
+        return validated_data
+
+    def validate_registration_address(self, validated_data):
+        if re.findall(pattern=const.ADDRESS_REGEX, string=validated_data) is None:
+            raise serializers.ValidationError('Invalid registration address')
+        return validated_data
+
     def validate_date_of_birth(self, validated_data):
         if validated_data > timezone.now().date():
             raise serializers.ValidationError('Date of birth cannot be in future')
