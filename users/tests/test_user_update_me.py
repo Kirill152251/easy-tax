@@ -184,6 +184,7 @@ def test_passport_num_patch(
     [
         ('+375447777777', status.HTTP_200_OK),
         ('', status.HTTP_400_BAD_REQUEST),
+        ('      ', status.HTTP_400_BAD_REQUEST),
         ('375449999999', status.HTTP_400_BAD_REQUEST),
         ('+3753291', status.HTTP_400_BAD_REQUEST),
         ('+375j91092222', status.HTTP_400_BAD_REQUEST),
@@ -199,6 +200,33 @@ def test_phone_num_patch(
     status
 ):
     request = factory.patch(user_me_url, {'phone_number': value})
+    force_authenticate(request, user=active_user)
+    response = user_me_view(request)
+    assert response.status_code == status
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    'value,status',
+    [
+        ('ул. Колотушкина, д.2222, кв. 21', status.HTTP_200_OK),
+        ('', status.HTTP_400_BAD_REQUEST),
+        ('        ', status.HTTP_400_BAD_REQUEST),
+        ('ул. Kalfjanfal, д.2222, кв. 21', status.HTTP_400_BAD_REQUEST),
+    ]
+)
+def test_addresses_patch(
+    factory,
+    user_me_url,
+    active_user,
+    user_me_view,
+    value,
+    status
+):
+    request = factory.patch(
+        user_me_url,
+        {'residential_address': value, 'registration_address': value}
+    )
     force_authenticate(request, user=active_user)
     response = user_me_view(request)
     assert response.status_code == status
