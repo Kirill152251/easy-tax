@@ -44,8 +44,12 @@ class Product(BaseModel):
         return self.name[:30]
 
 
+def product_image_upload_to(instance, filename):
+    return 'products_images/{0}/{1}'.format(instance.product.id, filename)
+
+
 class ProductImage(BaseModel):
-    photo = models.ImageField(upload_to='products_images/', validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png'])])
+    photo = models.ImageField(upload_to=product_image_upload_to, validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png'])])
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
 
     class Meta:
