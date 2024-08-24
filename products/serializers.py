@@ -9,6 +9,8 @@ class ProductCategorySerializer(serializers.ModelSerializer):
 
 
 class ProductImageSerializer(serializers.ModelSerializer):
+    photo = serializers.ImageField(max_length=200)
+
     class Meta:
         model = ProductImage
         fields = ('id', 'photo', 'product')
