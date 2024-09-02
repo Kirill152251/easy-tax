@@ -10,7 +10,7 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework import status, serializers
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.generics import CreateAPIView
+from rest_framework import generics
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -27,13 +27,14 @@ from users.serializers import (
     UploadAvatarSerializer,
     ConfirmCodeIDSerializer
 )
+from products.serializers import ProductSerializer
 from users.models import SignupSession
 
 
 User = get_user_model()
 
 
-class SignupAPIView(CreateAPIView):
+class SignupAPIView(generics.CreateAPIView):
     """
     Сохраняет пользователя в неактивном состоянии и отравляет на
     его почту письмо с кодом подтверждения.
@@ -159,7 +160,7 @@ class UserGetUpdateAPIView(APIView):
     permission_classes = [IsActive]
 
     @extend_schema(
-        tags=['users/me/'],
+        tags=['User me'],
         responses=UserGetSerializer
     )
     def get(self, request):
@@ -170,7 +171,7 @@ class UserGetUpdateAPIView(APIView):
         return Response(UserGetSerializer(request.user).data, status=status.HTTP_200_OK)
 
     @extend_schema(
-        tags=['users/me/'],
+        tags=['User me'],
         responses=UserGetSerializer,
         request=UpdateUserSerializer
     )
@@ -194,7 +195,7 @@ class UserAvatarAPIView(APIView):
     parser_classes = [MultiPartParser, FormParser]
 
     @extend_schema(
-        tags=['users/me/'],
+        tags=['User me'],
         responses=UserGetSerializer,
         request=UploadAvatarSerializer
     )
@@ -212,7 +213,7 @@ class UserAvatarAPIView(APIView):
         return Response(UserGetSerializer(request.user).data, status=status.HTTP_200_OK)
 
     @extend_schema(
-        tags=['users/me/'],
+        tags=['User me'],
         responses={
             status.HTTP_200_OK: OpenApiResponse(response=UserGetSerializer)
         }
@@ -225,3 +226,16 @@ class UserAvatarAPIView(APIView):
         user = request.user
         user.avatar.delete()
         return Response(UserGetSerializer(request.user).data, status=status.HTTP_200_OK)
+
+
+@extend_schema(tags=['User me'])
+class UserProductsListAPIView(generics.ListAPIView):
+    """
+    Получение всех продуктов пользователя. Права доступа:
+    аутентифицированный активный пользователь.
+    """
+    permission_classes = [IsActive]
+    serializer_class = ProductSerializer
+
+    def get_queryset(self):
+        return self.request.user.products.all()
