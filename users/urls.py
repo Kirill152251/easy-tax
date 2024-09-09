@@ -8,7 +8,9 @@ from users.views import (
     SignupAPIView,
     confirm_code,
     UserAvatarAPIView,
-    UserGetUpdateAPIView
+    UserGetUpdateAPIView,
+    UserProductsListAPIView,
+    UserOrdersListAPIView,
 )
 
 
@@ -21,4 +23,6 @@ urlpatterns = [
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('users/me/', UserGetUpdateAPIView.as_view(), name='user_me'),
     path('users/me/avatar/', UserAvatarAPIView.as_view(), name='user_avatar'),
+    path('users/me/products/', UserProductsListAPIView.as_view(), name='user_products'),
+    path('users/me/orders/', UserOrdersListAPIView.as_view(), name='user_orders'),
 ]
