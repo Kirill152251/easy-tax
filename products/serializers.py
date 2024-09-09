@@ -1,3 +1,5 @@
+import os
+
 from rest_framework import serializers
 from .models import ProductCategory, Product, ProductImage
 
@@ -14,6 +16,12 @@ class ProductImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductImage
         fields = ('id', 'photo', 'product')
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        if str(os.getenv('DEBUG', default='1')) == '0':
+            ret['photo'] = os.getenv('BASE_SERVER_URL') + instance.photo.url
+        return ret
 
 
 class ProductSerializer(serializers.ModelSerializer):
