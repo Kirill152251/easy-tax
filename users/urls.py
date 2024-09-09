@@ -9,7 +9,8 @@ from users.views import (
     confirm_code,
     UserAvatarAPIView,
     UserGetUpdateAPIView,
-    UserProductsListAPIView
+    UserProductsListAPIView,
+    UserOrdersListAPIView,
 )
 
 
@@ -23,4 +24,5 @@ urlpatterns = [
     path('users/me/', UserGetUpdateAPIView.as_view(), name='user_me'),
     path('users/me/avatar/', UserAvatarAPIView.as_view(), name='user_avatar'),
     path('users/me/products/', UserProductsListAPIView.as_view(), name='user_products'),
+    path('users/me/orders/', UserOrdersListAPIView.as_view(), name='user_orders'),
 ]

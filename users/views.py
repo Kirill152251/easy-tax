@@ -28,6 +28,7 @@ from users.serializers import (
     ConfirmCodeIDSerializer
 )
 from products.serializers import ProductSerializer
+from orders.serializers import OrderGetSerializer
 from users.models import SignupSession
 
 
@@ -239,3 +240,16 @@ class UserProductsListAPIView(generics.ListAPIView):
 
     def get_queryset(self):
         return self.request.user.products.all()
+
+
+@extend_schema(tags=['User me'])
+class UserOrdersListAPIView(generics.ListAPIView):
+    """
+    Получение заказов пользователя. Права доступа:
+    аутентифицированный активный пользователь.
+    """
+    permission_classes = [IsActive]
+    serializer_class = OrderGetSerializer
+
+    def get_queryset(self):
+        return self.request.user.orders_to_sell.all()
