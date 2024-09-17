@@ -7,6 +7,7 @@ from rest_framework_simplejwt.views import (
 from users.views import (
     SignupAPIView,
     confirm_code,
+    get_orders_sum,
     UserAvatarAPIView,
     UserGetUpdateAPIView,
     UserProductsListAPIView,
@@ -25,4 +26,5 @@ urlpatterns = [
     path('users/me/avatar/', UserAvatarAPIView.as_view(), name='user_avatar'),
     path('users/me/products/', UserProductsListAPIView.as_view(), name='user_products'),
     path('users/me/orders/', UserOrdersListAPIView.as_view(), name='user_orders'),
+    path('users/me/orders/sum/', get_orders_sum, name='orders_sum'),
 ]

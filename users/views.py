@@ -25,7 +25,7 @@ from users.serializers import (
     UserGetSerializer,
     UpdateUserSerializer,
     UploadAvatarSerializer,
-    ConfirmCodeIDSerializer
+    ConfirmCodeIDSerializer,
 )
 from products.serializers import ProductSerializer
 from orders.serializers import OrderGetSerializer
@@ -253,3 +253,19 @@ class UserOrdersListAPIView(generics.ListAPIView):
 
     def get_queryset(self):
         return self.request.user.orders_to_sell.all()
+
+
+@extend_schema(tags=['User me'])
+@api_view(['GET'])
+@permission_classes([IsActive])
+def get_orders_sum(request):
+    """
+    Получение суммы стоимсти всех заказов пользователь.
+    Пример ответа: {"sum": 720.42}.
+    Права доступа: аутентифицированный активный пользователь.
+    """
+    orders = request.user.orders_to_sell.all()
+    sum = 0
+    for order in orders:
+        sum += order.count * order.product.price
+    return Response({'sum': sum})
