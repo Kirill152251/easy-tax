@@ -245,7 +245,7 @@ class UserProductsListAPIView(generics.ListAPIView):
 @extend_schema(tags=['User me'])
 class UserOrdersListAPIView(generics.ListAPIView):
     """
-    Получение заказов пользователя. Права доступа:
+    Получение заказов для продажи. Права доступа:
     аутентифицированный активный пользователь.
     """
     permission_classes = [IsActive]
@@ -253,6 +253,19 @@ class UserOrdersListAPIView(generics.ListAPIView):
 
     def get_queryset(self):
         return self.request.user.orders_to_sell.all()
+
+
+@extend_schema(tags=['User me'])
+class UserOrdersToBuyListAPIView(generics.ListAPIView):
+    """
+    Получение заказов для покупки. Права доступа:
+    аутентифицированный активный пользователь.
+    """
+    permission_classes = [IsActive]
+    serializer_class = OrderGetSerializer
+
+    def get_queryset(self):
+        return self.request.user.orders_to_buy.all()
 
 
 @extend_schema(tags=['User me'])

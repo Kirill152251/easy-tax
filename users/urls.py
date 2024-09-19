@@ -12,6 +12,7 @@ from users.views import (
     UserGetUpdateAPIView,
     UserProductsListAPIView,
     UserOrdersListAPIView,
+    UserOrdersToBuyListAPIView
 )
 
 
@@ -26,5 +27,6 @@ urlpatterns = [
     path('users/me/avatar/', UserAvatarAPIView.as_view(), name='user_avatar'),
     path('users/me/products/', UserProductsListAPIView.as_view(), name='user_products'),
     path('users/me/orders/', UserOrdersListAPIView.as_view(), name='user_orders'),
+    path('users/me/orders_to_buy/', UserOrdersToBuyListAPIView.as_view(), name='user_orders_to_buy'),
     path('users/me/orders/sum/', get_orders_sum, name='orders_sum'),
 ]
